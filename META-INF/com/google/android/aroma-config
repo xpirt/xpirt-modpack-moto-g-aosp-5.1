@@ -14,35 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 #
-### FILE INFO:
-#
-# AROMA Installer 3.00b1 - AROMA Installer Test Script Configuration
-#       (c) 2011-2015 by Ahmad Amarullah
-#           amarullz - xda-developers
-#           http://www.amarullz.com/
-#
-#       Binary Version  : 3.00b1
-#       Binary Codename : MELATI
-#
-### INFO:
-#
-# * AROMA Resource Dir  = META-INF/com/google/android/aroma
-#
-# * AROMA Temporary Dir = /tmp/aroma/
-#
-# * About Icon          = @alert - show <AROMA Resource Dir>/@alert.png
-#                         or if theme used it will find <themedir>/icon.alert.png
-#                         you can still access it via "@alert"
-#
-# * dp                  = Device Pixelate. WVGA/QHD = 3, HVGA = 2.
-#                         dp calculated with = round(min(width,height) / 160)
-#
 
 ini_set("rom_name",             "xpirt modPack");
 ini_set("rom_version",          "#1");
 ini_set("rom_author",           "xpirt, lyapota");
 ini_set("rom_device",           "Moto G 2013 - AOSP 5.1");
-ini_set("rom_date",             "March 24, 2015");
+ini_set("rom_date",             "March 25, 2015");
 
 ini_set("force_colorspace","rgba");
 
@@ -164,75 +141,11 @@ checkbox(
   "build.prop tweaks","various build.prop tweaks",0
 );
 
-#Select systemui mods
-#checkbox(
-#  "systemui",
-#  "please indicate:",
-#  "@apps",
-#  "sysui.prop",
-#
-#  "show battery %","percentage inside or beside battery",0
-#);
-
 
 ###################################################################################################################
 #
 # STEP 4 - SETUP INSTALLATION
 #
-
-# navbar size
-if prop("common.prop","item.0.7")=="1" then
-  selectbox(
-    "navbar size",
-    "please indicate:",
-    "@sysmod",
-    "navbar.prop",
-    
-    "stock","48 dpi",1,
-    "small","42 dpi",0,
-    "smaller","36 dpi",0,
-    "smallest","32 dpi",0
-  );
-else
-    writetmpfile("navbar.prop", "selected.0=1\n");
-endif;
-
-#select dpi
-if prop("common.prop","item.0.8")=="1" then
-  selectbox(
-    "display dpi",
-    "please indicate:",
-    "icons/personalize",
-    "dpi.prop",
-    
-    "320","stock",1,
-    "300","",0,
-    "280","",0,
-    "260","",0,
-    "240","",0,
-    "220","",0,
-    "200","",0,
-    "180","",0
-  );
-else
-    writetmpfile("dpi.prop", "selected.0=1\n");
-endif;
-
-# battery %
-if prop("sysui.prop","item.0.1")=="1" then
-  selectbox(
-    "battery %",
-    "please indicate:",
-    "@sysmod",
-    "batt.prop",
-    
-    "stock","no %",1,
-    "inside","% inside batt icon",0,
-    "beside","% beside batt icon",0
-  );
-else
-    writetmpfile("batt.prop", "selected.0=1\n");
-endif;
 
 #select build.prop tweaks
 if prop("common.prop","item.0.1")=="1" then
@@ -247,82 +160,6 @@ if prop("common.prop","item.0.1")=="1" then
     "disable mtp notifies","",1,
     "disable usb notifies","",1
   );
-endif;
-
-#longpress volume key
-if prop("common.prop","item.0.11")=="1" then
-    selectbox(
-      "longpress volume key (screen off)",
-      "please indicate:",
-      "icons/apps",
-      "volkey.prop",
-      
-      "no actions","",1,
-      "show ambient display","",0,
-      "Dwn play(pause)/Up skip to next","",0,
-      "Dwn skip to previous/Up skip to next","",0
-    );
-else
-    writetmpfile("volkey.prop", "selected.0=1\n");
-endif;
-
-#select system tweaks
-if prop("common.prop","item.0.12")=="1" then
-  checkbox(
-    "system.prop tweaks",
-    "please indicate:",
-    "@sysmod",
-    "system.prop",
-    
-    "hide alarm notify","",0,
-    "hide bluetooth notify","",0,
-    "hide ime notify","",0,
-    "hide volume notify","",0,
-    "hide am/pm","",0
-  );
-endif;
-
-#select volume panel timeout
-if prop("common.prop","item.0.14")=="1" then
-	selectbox(
-      "volume panel timeout",
-      "please indicate:",
-      "icons/apps",
-      "vtimeout.prop",
-      
-      "don't change","",1,
-      "0.5 seconds","",0,
-      "1 second","",0,
-      "2 seconds","",0,
-      "3 seconds","stock value",0,
-      "4 seconds","",0
-    );
-else
-    writetmpfile("vtimeout.prop", "selected.0=1\n");
-endif;
-
-#select heads up timeout
-if prop("common.prop","item.0.15")=="1" then
-	selectbox(
-      "heads up timeout",
-      "please indicate:",
-      "icons/apps",
-      "htimeout.prop",
-      
-      "don't change","",1,
-      "1 second","",0,
-      "2 seconds","",0,
-      "3 seconds","stock value",0,
-      "4 seconds","",0,
-      "5 seconds","",0,
-      "6 seconds","",0,
-      "7 seconds","",0,
-      "8 seconds","",0,
-      "9 seconds","",0,
-      "10 seconds","",0
-    );
-else
-    writetmpfile("vtimeout.prop", "selected.0=1\n");
 endif;
 
 ###################################################################################################################
@@ -362,4 +199,3 @@ else
            "\n\ninstaller status: "+ getvar("retstatus"),
            "@alert");
 endif;
-
