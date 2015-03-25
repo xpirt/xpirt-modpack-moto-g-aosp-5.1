@@ -143,7 +143,8 @@ checkbox(
   "hide search bar in recents","hide search bar from recent apps",0,
   "system tweaks","</b>submenu...</b>",0,
   "volume panel timeout","</b>submenu...</b>",0,
-  "volume change sound","enable sound when changing volume",0
+  "volume change sound","enable sound when changing volume",0,
+  "longpress back to kill","longpress back key to kill app",0
 );
 
 #Select systemui mods

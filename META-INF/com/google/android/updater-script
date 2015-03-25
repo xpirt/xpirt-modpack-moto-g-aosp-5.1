@@ -256,6 +256,24 @@ endif;
 
 
 #####################
+## longpress back to kill
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.7") == "1"
+then
+    ui_print("|-> longpress backkey app    	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_backkey_kill", "1");
+else
+    ui_print("|-> longpress backkey app    	DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_backkey_kill", "0");
+endif;
+
+
+#######################################################################################
+
+
+#####################
 ## systemui mods
 #####################
 
