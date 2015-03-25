@@ -138,7 +138,24 @@ checkbox(
   "@apps",
   "common.prop",
   
-  "build.prop tweaks","various build.prop tweaks",0
+  "build.prop tweaks","various build.prop tweaks",0,
+  "menu navbar persist","persistent menu button in navbar",0,
+  "hide search bar in recents","hide search bar from recent apps",0,
+  "system tweaks","</b>submenu...</b>",0,
+  "volume panel timeout","</b>submenu...</b>",0,
+  "volume change sound","enable sound when changing volume",0
+);
+
+#Select systemui mods
+checkbox(
+  "systemui",
+  "please indicate:",
+  "@apps",
+  "sysui.prop",
+
+  "disable heads up","disable heads up notifications",0,
+  "disable brightness slider","disable brightness slider on panel",0,
+  "enable ticker", "disable heads up and enable old ticker notifications",0
 );
 
 
@@ -160,6 +177,38 @@ if prop("common.prop","item.0.1")=="1" then
     "disable mtp notifies","",1,
     "disable usb notifies","",1
   );
+endif;
+
+#select system tweaks
+if prop("common.prop","item.0.4")=="1" then
+  checkbox(
+    "system.prop tweaks",
+    "please indicate:",
+    "@sysmod",
+    "system.prop",
+
+    "hide ime notify","",0,
+    "hide am/pm","",0
+  );
+endif;
+
+#select volume panel timeout
+if prop("common.prop","item.0.5")=="1" then
+	selectbox(
+      "volume panel timeout",
+      "please indicate:",
+      "icons/apps",
+      "vtimeout.prop",
+      
+      "don't change","",1,
+      "0.5 seconds","",0,
+      "1 second","",0,
+      "2 seconds","",0,
+      "3 seconds","stock value",0,
+      "4 seconds","",0
+    );
+else
+    writetmpfile("vtimeout.prop", "selected.0=1\n");
 endif;
 
 ###################################################################################################################

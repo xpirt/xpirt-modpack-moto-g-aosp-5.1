@@ -136,6 +136,160 @@ then
 endif;
 
 
+#####################
+## menu navbar persist
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.2") == "1"
+then
+    ui_print("|-> menu navbar persist     		APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_show_menu_persist", "1");
+else
+    ui_print("|-> menu navbar persist     		DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_show_menu_persist", "0");
+endif;
+
+
+#####################
+## hide search bar in recents
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.3") == "1"
+then
+    ui_print("|-> hide search bar in recents  	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_recents_search", "1");
+else
+    ui_print("|-> hide search bar in recents  	DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_recents_search", "0");
+endif;
+
+
+#####################
+## system tweaks
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.4") == "1"
+then
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.1") == "1"
+   then
+       ui_print("|-> ime notify                DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ime", "1");
+   else
+       ui_print("|-> ime notify                ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ime", "0");
+   endif;
+
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.2") == "1"
+   then
+       ui_print("|-> am/pm             		   DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ampm", "1");
+   else
+       ui_print("|-> am/pm             		   ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ampm", "0");
+   endif;
+endif;
+
+
+#####################
+## volume panel timeout
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.5") == "1"
+then
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "1"
+    then
+        ui_print("|-> volume panel timeout         		NOT_CHANGED");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "2"
+    then
+        ui_print("|-> volume panel timeout         		0.5_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "500");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "3"
+    then
+        ui_print("|-> volume panel timeout           	1_SECOND");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "1000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "4"
+    then
+        ui_print("|-> volume panel timeout           	2_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "2000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "5"
+    then
+        ui_print("|-> volume panel timeout           	3_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "3000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "6"
+    then
+        ui_print("|-> volume panel timeout           	4_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "4000");
+    endif;
+endif;
+
+
+#####################
+## volume change sound
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.6") == "1"
+then
+    ui_print("|-> volume change sound        	ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_change_sound", "1");
+else
+    ui_print("|-> volume change sound        	DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_change_sound", "0");
+endif;
+
+
+#####################
+## systemui mods
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.1") == "1"
+then
+    ui_print("|-> disable heads up        		APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "heads_up_notifications_enabled", "0");
+else
+    ui_print("|-> disable heads up        		DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "heads_up_notifications_enabled", "1");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.2") == "1"
+then
+    ui_print("|-> disable brightness slider        			APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_brightness_slider_enabled", "0");
+else
+    ui_print("|-> disable brightness slider        			DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_brightness_slider_enabled", "1");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.3") == "1"
+then
+    ui_print("|-> enable ticker				      APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_ticker", "1");
+else
+    ui_print("|-> enable ticker				      DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_ticker", "0");
+endif;
+
+
 ###########################Permissions############################
 
 ui_print("@permissions");
