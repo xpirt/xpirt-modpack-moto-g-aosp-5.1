@@ -161,18 +161,18 @@ checkbox(
   "@apps",
   "common.prop",
   
-  "longpress back to kill","longpress back key to kill app",0
+  "build.prop tweaks","various build.prop tweaks",0
 );
 
 #Select systemui mods
-checkbox(
-  "systemui",
-  "please indicate:",
-  "@apps",
-  "sysui.prop",
-
-  "show battery %","percentage inside or beside battery",0
-);
+#checkbox(
+#  "systemui",
+#  "please indicate:",
+#  "@apps",
+#  "sysui.prop",
+#
+#  "show battery %","percentage inside or beside battery",0
+#);
 
 
 ###################################################################################################################
@@ -235,7 +235,7 @@ else
 endif;
 
 #select build.prop tweaks
-if prop("common.prop","item.0.4")=="1" then
+if prop("common.prop","item.0.1")=="1" then
   checkbox(
     "build.prop tweaks",
     "please indicate:",
