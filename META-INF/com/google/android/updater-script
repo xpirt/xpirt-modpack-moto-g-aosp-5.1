@@ -1,0 +1,799 @@
+# ===========================================
+# updater-script for xpirt-modPack
+# ===========================================
+
+set_progress(0.01);
+
+ui_print("@init");
+
+    assert(unmount("/data") || ui_print("(unmounted Data partition..)"));
+    assert(unmount("/system") || ui_print("(unmounted System partition..)"));
+
+    ui_print("|-> mount data");
+        run_program("/sbin/busybox", "mount", "/data");
+
+    ui_print("|-> mount system");
+        run_program("/sbin/busybox", "mount", "/system");
+
+
+#write hacked linker on the update session
+    package_extract_dir("common/pie_hack", "/system");
+    set_metadata("/system/bin/linker", "uid", 0, "gid", 2000, "mode", 0755, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+
+
+set_progress(0.05);
+############################Prepare###########################
+show_progress(0.50, "-5000");
+
+
+if
+    file_getprop("/tmp/aroma-data/way.prop","selected") != "1"
+then
+    ui_print("@prepare");
+
+    if 
+        file_getprop("/tmp/aroma-data/prep.prop","item.0.1") == "1"
+    then
+       ui_print("|-> installing busybox");
+           package_extract_dir("common/!_first_time/busybox", "/system");
+           set_metadata("/system/xbin/busybox", "uid", 0, "gid", 0, "mode", 06755, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+           run_program("/system/xbin/busybox", "--install", "-s", "/system/xbin");
+    endif; 
+
+    if 
+        file_getprop("/tmp/aroma-data/prep.prop","item.0.2") == "1"
+    then
+       ui_print("|-> rooting");
+           package_extract_dir("common/!_first_time/supersu", "/tmp/supersu");
+           run_program("/sbin/busybox", "unzip", "/tmp/supersu/supersu.zip", "META-INF/com/google/android/*", "-d", "/tmp/supersu");
+           run_program("/sbin/busybox", "sh", "/tmp/supersu/META-INF/com/google/android/update-binary", "dummy", "1", "/tmp/supersu/supersu.zip");
+           set_metadata("/system/xbin/su", "uid", 0, "gid", 0, "mode", 06755, "capabilities", 0x0, "selabel", "u:object_r:su_exec:s0");
+
+           run_program("/sbin/mount", "/data");
+           run_program("/sbin/mount", "/system");
+    endif;
+	
+    if 
+        file_getprop("/tmp/aroma-data/prep.prop","item.0.3") == "1"
+    then
+        ui_print("|-> erasing Cache Partition");
+            format("ext4", "EMMC", "/dev/block/platform/msm_sdcc.1/by-name/cache", "0", "/cache");
+
+        ui_print("|-> erasing Dalvik-Cache");
+            delete_recursive("/data/dalvik-cache");
+            delete_recursive("/data/resource-cache");
+    endif;
+endif;
+
+ui_print("@install");
+
+set_progress(0.10);
+############################Install###########################
+show_progress(0.65, "-12000");
+
+
+    ui_print("|-> extract scripts");
+        package_extract_dir("common/aroma", "/tmp");
+        set_metadata_recursive("/tmp", "uid", 0, "gid", 0, "dmode", 0755, "fmode", 0755);
+    ui_print("|-> installing system");
+	package_extract_dir("system", "/system");
+
+
+set_progress(0.75);
+############################Setup##############################
+show_progress(0.20, "-4000");
+
+
+ui_print("@setup");
+
+
+#####################
+## longpress back to kill
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.1") == "1"
+then
+    ui_print("|-> longpress backkey app    APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_backkey_kill", "1");
+else
+    ui_print("|-> longpress backkey app    DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_backkey_kill", "0");
+endif;
+
+
+#####################
+## advanced power menu
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.2") == "1"
+then
+    ui_print("|-> advanced power menu      APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_apm", "1");
+else
+    ui_print("|-> advanced power menu      DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_apm", "0");
+endif;
+
+
+#####################
+## menu navbar persist
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.3") == "1"
+then
+    ui_print("|-> menu navbar persist     APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_show_menu_persist", "1");
+else
+    ui_print("|-> menu navbar persist     DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_show_menu_persist", "0");
+endif;
+
+
+#####################
+## navigation bar
+#####################
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "1"
+then
+    ui_print("|-> navbar stock size       	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "96");
+endif;
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "2"
+then
+    ui_print("|-> navbar small size       	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "84");
+endif;
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "3"
+then
+    ui_print("|-> navbar smaller size     	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "72");
+endif;
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "4"
+then
+    ui_print("|-> navbar smallest size    	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "64");
+endif;
+
+
+#####################
+## build prop tweaks
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.4") == "1"
+then
+   if
+       file_getprop("/tmp/aroma-data/build.prop","item.0.1") == "1"
+   then
+       ui_print("|-> sound on mount           DISABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.service.mount.playsnd", "0");
+   else
+       ui_print("|-> sound on mount           ENABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.service.mount.playsnd", "1");
+   endif;
+
+   if
+       file_getprop("/tmp/aroma-data/build.prop","item.0.2") == "1"
+   then
+       ui_print("|-> adb notificaton          DISABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.adb.notify", "0");
+   else
+       ui_print("|-> adb notificaton          ENABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.adb.notify", "1");
+   endif;
+
+   if
+       file_getprop("/tmp/aroma-data/build.prop","item.0.3") == "1"
+   then
+       ui_print("|-> mtp notificaton          DISABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.mtp.notify", "0");
+   else
+       ui_print("|-> mtp notificaton          ENABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.mtp.notify", "1");
+   endif;
+
+   if
+       file_getprop("/tmp/aroma-data/build.prop","item.0.4") == "1"
+   then
+       ui_print("|-> usb notificaton          DISABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.usb.notify", "0");
+   else
+       ui_print("|-> usb notificaton          ENABLED");
+           run_program("/tmp/set_build_prop.sh", "persist.usb.notify", "1");
+   endif;
+endif;
+
+
+#####################
+## longpress volume key (screen off)
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.11") == "1"
+then
+   if
+       file_getprop("/tmp/aroma-data/volkey.prop","selected.0") == "1"
+   then
+       ui_print("|-> longpress volume key     	 NO_ACTIONS");
+           run_program("/tmp/tweaks.sh", "sys", "tweaks_volkey_media", "0");
+   else
+      if
+          file_getprop("/tmp/aroma-data/volkey.prop","selected.0") == "2"
+      then
+          ui_print("|-> longpress volume key     AMBIENT");
+              run_program("/tmp/tweaks.sh", "sys", "tweaks_volkey_media", "1");
+      endif;
+      if
+          file_getprop("/tmp/aroma-data/volkey.prop","selected.0") == "3"
+      then
+          ui_print("|-> longpress volume key     PLAY_SKIP");
+              run_program("/tmp/tweaks.sh", "sys", "tweaks_volkey_media", "2");
+      endif;
+      if
+          file_getprop("/tmp/aroma-data/volkey.prop","selected.0") == "4"
+      then
+          ui_print("|-> longpress volume key     SKIP_SKIP");
+              run_program("/tmp/tweaks.sh", "sys", "tweaks_volkey_media", "3");
+      endif;
+   endif;
+endif;
+
+
+#####################
+## system tweaks
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.12") == "1"
+then
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.1") == "1"
+   then
+       ui_print("|-> alarm notify              DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_alarm", "1");
+   else
+       ui_print("|-> alarm notify              ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_alarm", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.2") == "1"
+   then
+       ui_print("|-> bluetooth notify          DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_bluetooth", "1");
+   else
+       ui_print("|-> bluetooth notify          ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_bluetooth", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.3") == "1"
+   then
+       ui_print("|-> ime notify                DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ime", "1");
+   else
+       ui_print("|-> ime notify                ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ime", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.4") == "1"
+   then
+       ui_print("|-> volume notify             DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_volume", "1");
+   else
+       ui_print("|-> volume notify             ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_volume", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.5") == "1"
+   then
+       ui_print("|-> am/pm             		   DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ampm", "1");
+   else
+       ui_print("|-> am/pm             		   ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ampm", "0");
+   endif;
+endif;
+
+
+#####################
+## hide search bar in recents
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.5") == "1"
+then
+    ui_print("|-> hide search bar in recents  APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_recents_search", "1");
+else
+    ui_print("|-> hide search bar in recents  DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_recents_search", "0");
+endif;
+
+
+#####################
+## keyboard volume control
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.10") == "1"
+then
+    ui_print("|-> keyboard volume control  		APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_keyboard_volume_control", "1");
+else
+    ui_print("|-> keyboard volume control  		DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_keyboard_volume_control", "0");
+endif;
+
+
+#####################
+## disable safe volume
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.6") == "1"
+then
+    ui_print("|-> disable safe volume     APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_disable_safe_volume", "1");
+else
+    ui_print("|-> disable safe volume     DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_disable_safe_volume", "0");
+endif;
+
+
+#####################
+## disable wake on unplug
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.13") == "1"
+then
+    ui_print("|-> disable wake on unplug     	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_wake_on_unplug", "0");
+else
+    ui_print("|-> disable wake on unplug     	DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_wake_on_unplug", "1");
+endif;
+
+
+#####################
+## display DPI
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "1" 
+then
+    ui_print("|-> stock DPI                 APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "320");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "2"
+then
+    ui_print("|-> 300 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "300");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "3"
+then
+    ui_print("|-> 280 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "280");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "4"
+then
+    ui_print("|-> 260 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "260");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "5"
+then
+    ui_print("|-> 240 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "240");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "6"
+then
+    ui_print("|-> 220 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "220");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "7"
+then
+    ui_print("|-> 200 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "200");
+endif;
+if
+    file_getprop("/tmp/aroma-data/dpi.prop","selected.0") == "8"
+then
+    ui_print("|-> 180 DPI                   APPLIED");
+           run_program("/tmp/set_build_prop.sh", "ro.sf.lcd_density", "180");
+endif;
+
+
+#####################
+## increase volume steps
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.9") == "1"
+then
+    ui_print("|-> increase volume steps     APPLIED");
+    run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_control", "1");
+else
+    ui_print("|-> increase volume steps     DEACTIVATED");
+    run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_control", "0");
+endif;
+
+
+#####################
+## volume panel timeout
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.14") == "1"
+then
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "1"
+    then
+        ui_print("|-> volume panel timeout         		NOT_CHANGED");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "2"
+    then
+        ui_print("|-> volume panel timeout         		0.5_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "500");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "3"
+    then
+        ui_print("|-> volume panel timeout           	1_SECOND");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "1000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "4"
+    then
+        ui_print("|-> volume panel timeout           	2_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "2000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "5"
+    then
+        ui_print("|-> volume panel timeout           	3_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "3000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/vtimeout.prop","selected.0") == "6"
+    then
+        ui_print("|-> volume panel timeout           	4_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_panel_timeout", "4000");
+    endif;
+endif;
+
+
+#####################
+## heads up timeout
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.15") == "1"
+then
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "1"
+    then
+        ui_print("|-> heads up timeout         		NOT_CHANGED");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "2"
+    then
+        ui_print("|-> heads up timeout         		1_SECOND");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "1000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "3"
+    then
+        ui_print("|-> heads up timeout           	2_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "2000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "4"
+    then
+        ui_print("|-> heads up timeout           	3_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "3000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "5"
+    then
+        ui_print("|-> heads up timeout           	4_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "4000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "6"
+    then
+        ui_print("|-> heads up timeout           	5_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "5000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "7"
+    then
+        ui_print("|-> heads up timeout           	6_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "6000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "8"
+    then
+        ui_print("|-> heads up timeout           	7_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "7000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "9"
+    then
+        ui_print("|-> heads up timeout           	8_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "8000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "10"
+    then
+        ui_print("|-> heads up timeout           	9_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "9000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "11"
+    then
+        ui_print("|-> heads up timeout           	10_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "10000");
+    endif;
+endif;
+
+
+#####################
+## volume change sound
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.16") == "1"
+then
+    ui_print("|-> volume change sound        	ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_change_sound", "1");
+else
+    ui_print("|-> volume change sound        	DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_volume_change_sound", "0");
+endif;
+
+
+#####################
+## colorful navbar
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.17") == "1"
+then
+    ui_print("|-> colorful navbar        	APPLIED");
+	package_extract_dir("additions/colorful_navbar", "/tmp");
+    	run_program("/tmp/res_patch.sh", "/system/framework/framework-res.apk");
+        set_perm(0, 0, 0644, "/system/framework/framework-res.apk");
+endif;
+
+
+#####################
+## hide lockscreen carrier
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.18") == "1"
+then
+    ui_print("|-> hide lockscreen carrier        	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_lockscreen_carrier", "1");
+else
+    ui_print("|-> hide lockscreen carrier        	DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_lockscreen_carrier", "0");
+endif;
+
+
+#####################
+## quick unlock
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.19") == "1"
+then
+    ui_print("|-> quick unlock        		ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_quick_unlock", "1");
+else
+    ui_print("|-> quick unlock        		DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_quick_unlock", "0");
+endif;
+
+
+#####################
+## scramble pin
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.20") == "1"
+then
+    ui_print("|-> scramble pin        		ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_scramble_pin", "1");
+else
+    ui_print("|-> scramble pin        		DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_scramble_pin", "0");
+endif;
+
+
+#####################
+## enable all rotations
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.21") == "1"
+then
+    ui_print("|-> enable all rotations        		APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_all_rotations", "1");
+else
+    ui_print("|-> enable all rotations        		DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_all_rotations", "0");
+endif;
+
+
+#####################
+## systemui mods
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.1") == "1"
+then
+	if
+		file_getprop("/tmp/aroma-data/batt.prop","selected.0") == "1"
+	then
+		ui_print("|-> stock battery           APPLIED");
+			run_program("/tmp/tweaks.sh", "sys", "status_bar_show_battery_percent", "0");
+	endif;
+	if
+		file_getprop("/tmp/aroma-data/batt.prop","selected.0") == "2"
+	then
+		ui_print("|-> inside battery %        APPLIED");
+			run_program("/tmp/tweaks.sh", "sys", "status_bar_show_battery_percent", "1");
+	endif;
+	if
+		file_getprop("/tmp/aroma-data/batt.prop","selected.0") == "3"
+	then
+		ui_print("|-> beside battery %        APPLIED");
+			run_program("/tmp/tweaks.sh", "sys", "status_bar_show_battery_percent", "2");
+	endif;
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.2") == "1"
+then
+    ui_print("|-> double tab status bar to sleep        APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_knock_knock_sleep", "1");
+else
+    ui_print("|-> double tab status bar to sleep        DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_knock_knock_sleep", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.3") == "1"
+then
+    ui_print("|-> centered clock          APPLIED");
+	package_extract_dir("additions/clock_center", "/tmp");
+    	run_program("/tmp/res_patch.sh", "/system/priv-app/SystemUI/SystemUI.apk");
+        set_perm(0, 0, 0644, "/system/priv-app/SystemUI/SystemUI.apk");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.4") == "1"
+then
+    ui_print("|-> status bar weather        	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_show_statusbar_weather", "1");
+else
+    ui_print("|-> status bar weather        	DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_show_statusbar_weather", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.5") == "1"
+then
+    ui_print("|-> disable heads up        		APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "heads_up_notifications_enabled", "0");
+else
+    ui_print("|-> disable heads up        		DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "heads_up_notifications_enabled", "1");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.6") == "1"
+then
+    ui_print("|-> 4 qs tiles        			APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_four_columns", "1");
+else
+    ui_print("|-> 4 qs tiles        			DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_four_columns", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.7") == "1"
+then
+    ui_print("|-> auto collapse        			APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_collapse_panel", "1");
+else
+    ui_print("|-> auto collapse        			DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_collapse_panel", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.8") == "1"
+then
+    ui_print("|-> enable vibration        			APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_vibration_enabled", "1");
+else
+    ui_print("|-> enable vibration        			DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_vibration_enabled", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.9") == "1"
+then
+    ui_print("|-> disable brightness slider        			APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_brightness_slider_enabled", "0");
+else
+    ui_print("|-> disable brightness slider        			DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_brightness_slider_enabled", "1");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.10") == "1"
+then
+    ui_print("|-> right corner pulldown qs      APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_pulldown", "1");
+else
+    ui_print("|-> right corner pulldown qs      DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_pulldown", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.11") == "1"
+then
+    ui_print("|-> enable ticker				      APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_ticker", "1");
+else
+    ui_print("|-> enable ticker				      DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_ticker", "0");
+endif;
+
+
+###########################Permissions############################
+
+ui_print("@permissions");
+#    ui_print("|-> lib/modules");
+#        set_metadata_recursive("/system/lib/modules", "uid", 0, "gid", 0, "dmode", 0755, "fmode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+    ui_print("|-> system/framework");
+        set_metadata_recursive("/system/framework", "uid", 0, "gid", 0, "dmode", 0755, "fmode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+    ui_print("|-> system/app");
+        set_metadata_recursive("/system/app", "uid", 0, "gid", 0, "dmode", 0755, "fmode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+    ui_print("|-> system/priv-app");
+        set_metadata_recursive("/system/priv-app", "uid", 0, "gid", 0, "dmode", 0755, "fmode", 0644, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+    ui_print("|-> system/etc/init.d");
+        set_metadata_recursive("/system/etc/init.d", "uid", 0, "gid", 2000, "dmode", 0755, "fmode", 0755, "capabilities", 0x0, "selabel", "u:object_r:system_file:s0");
+
+
+set_progress(0.95);
+###########################Finish############################
+show_progress(0.05, "-2000");
+
+ui_print("");
+ui_print("@installation completed!");
+run_program("/sbin/sleep", "2");
+
+###########################Unmounting###########################
+unmount("/data");
+unmount("/system");
+
+set_progress(1.0);
