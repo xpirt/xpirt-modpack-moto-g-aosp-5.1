@@ -270,6 +270,36 @@ else
 endif;
 
 
+#####################
+## navigation bar
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "1"
+then
+    ui_print("|-> navbar stock size       	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "96");
+endif;
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "2"
+then
+    ui_print("|-> navbar small size       	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "84");
+endif;
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "3"
+then
+    ui_print("|-> navbar smaller size     	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "72");
+endif;
+if
+    file_getprop("/tmp/aroma-data/navbar.prop","selected.0") == "4"
+then
+    ui_print("|-> navbar smallest size    	APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_navbar_height", "64");
+endif;
+
+
 #######################################################################################
 
 

@@ -144,7 +144,8 @@ checkbox(
   "system tweaks","</b>submenu...</b>",0,
   "volume panel timeout","</b>submenu...</b>",0,
   "volume change sound","enable sound when changing volume",0,
-  "longpress back to kill","longpress back key to kill app",0
+  "longpress back to kill","longpress back key to kill app",0,
+  "change navbar size","</b>submenu...</b>",0
 );
 
 #Select systemui mods
@@ -210,6 +211,23 @@ if prop("common.prop","item.0.5")=="1" then
     );
 else
     writetmpfile("vtimeout.prop", "selected.0=1\n");
+endif;
+
+# navbar size
+if prop("common.prop","item.0.8")=="1" then
+  selectbox(
+    "navbar size",
+    "please indicate:",
+    "@sysmod",
+    "navbar.prop",
+    
+    "stock","48 dpi",1,
+    "small","42 dpi",0,
+    "smaller","36 dpi",0,
+    "smallest","32 dpi",0
+  );
+else
+    writetmpfile("navbar.prop", "selected.0=1\n");
 endif;
 
 ###################################################################################################################
