@@ -146,7 +146,8 @@ checkbox(
   "volume change sound","enable sound when changing volume",0,
   "longpress back to kill","longpress back key to kill app",0,
   "change navbar size","</b>submenu...</b>",0,
-  "heads up timeout","</b>submenu...</b>",0
+  "heads up timeout","</b>submenu...</b>",0,
+  "display DPI", "</b>submenu...</b>",0
 );
 
 #Select systemui mods
@@ -258,6 +259,27 @@ if prop("common.prop","item.0.9")=="1" then
     );
 else
     writetmpfile("vtimeout.prop", "selected.0=1\n");
+endif;
+
+#select dpi
+if prop("common.prop","item.0.10")=="1" then
+  selectbox(
+    "display dpi",
+    "please indicate:",
+    "icons/personalize",
+    "dpi.prop",
+    
+    "320","stock",1,
+    "300","",0,
+    "280","",0,
+    "260","",0,
+    "240","",0,
+    "220","",0,
+    "200","",0,
+    "180","",0
+  );
+else
+    writetmpfile("dpi.prop", "selected.0=1\n");
 endif;
 
 ###################################################################################################################
