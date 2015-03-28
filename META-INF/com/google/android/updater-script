@@ -176,15 +176,45 @@ then
    if
        file_getprop("/tmp/aroma-data/system.prop","item.0.1") == "1"
    then
+       ui_print("|-> alarm notify              DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_alarm", "1");
+   else
+       ui_print("|-> alarm notify              ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_alarm", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.2") == "1"
+   then
+       ui_print("|-> bluetooth notify          DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_bluetooth", "1");
+   else
+       ui_print("|-> bluetooth notify          ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_bluetooth", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.3") == "1"
+   then
        ui_print("|-> ime notify                DISABLED");
     	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ime", "1");
    else
        ui_print("|-> ime notify                ENABLED");
     	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ime", "0");
    endif;
-
+   
    if
-       file_getprop("/tmp/aroma-data/system.prop","item.0.2") == "1"
+       file_getprop("/tmp/aroma-data/system.prop","item.0.4") == "1"
+   then
+       ui_print("|-> volume notify             DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_volume", "1");
+   else
+       ui_print("|-> volume notify             ENABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_volume", "0");
+   endif;
+   
+   if
+       file_getprop("/tmp/aroma-data/system.prop","item.0.5") == "1"
    then
        ui_print("|-> am/pm             		   DISABLED");
     	run_program("/tmp/tweaks.sh", "sys", "tweaks_hide_ampm", "1");
@@ -300,6 +330,81 @@ then
 endif;
 
 
+#####################
+## heads up timeout
+#####################
+
+if
+    file_getprop("/tmp/aroma-data/common.prop","item.0.9") == "1"
+then
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "1"
+    then
+        ui_print("|-> heads up timeout         		NOT_CHANGED");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "2"
+    then
+        ui_print("|-> heads up timeout         		1_SECOND");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "1000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "3"
+    then
+        ui_print("|-> heads up timeout           	2_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "2000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "4"
+    then
+        ui_print("|-> heads up timeout           	3_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "3000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "5"
+    then
+        ui_print("|-> heads up timeout           	4_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "4000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "6"
+    then
+        ui_print("|-> heads up timeout           	5_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "5000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "7"
+    then
+        ui_print("|-> heads up timeout           	6_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "6000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "8"
+    then
+        ui_print("|-> heads up timeout           	7_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "7000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "9"
+    then
+        ui_print("|-> heads up timeout           	8_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "8000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "10"
+    then
+        ui_print("|-> heads up timeout           	9_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "9000");
+    endif;
+    if
+        file_getprop("/tmp/aroma-data/htimeout.prop","selected.0") == "11"
+    then
+        ui_print("|-> heads up timeout           	10_SECONDS");
+            run_program("/tmp/tweaks.sh", "sys", "tweaks_heads_up_timeout", "10000");
+    endif;
+endif;
+
+
 #######################################################################################
 
 
@@ -335,6 +440,26 @@ then
 else
     ui_print("|-> enable ticker				      DISABLED");
     	run_program("/tmp/tweaks.sh", "sys", "tweaks_enable_ticker", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.4") == "1"
+then
+    ui_print("|-> double tab status bar to sleep        APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_knock_knock_sleep", "1");
+else
+    ui_print("|-> double tab status bar to sleep        DEACTIVATED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_knock_knock_sleep", "0");
+endif;
+
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.5") == "1"
+then
+    ui_print("|-> right corner pulldown qs      APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_pulldown", "1");
+else
+    ui_print("|-> right corner pulldown qs      DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_pulldown", "0");
 endif;
 
 

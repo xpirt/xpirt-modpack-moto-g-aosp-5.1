@@ -145,7 +145,8 @@ checkbox(
   "volume panel timeout","</b>submenu...</b>",0,
   "volume change sound","enable sound when changing volume",0,
   "longpress back to kill","longpress back key to kill app",0,
-  "change navbar size","</b>submenu...</b>",0
+  "change navbar size","</b>submenu...</b>",0,
+  "heads up timeout","</b>submenu...</b>",0
 );
 
 #Select systemui mods
@@ -157,7 +158,9 @@ checkbox(
 
   "disable heads up","disable heads up notifications",0,
   "disable brightness slider","disable brightness slider on panel",0,
-  "enable ticker", "disable heads up and enable old ticker notifications",0
+  "enable ticker", "disable heads up and enable old ticker notifications",0,
+  "double tap to sleep","double tab status bar to sleep",0,
+  "quick pulldown", "right statusbar corner quick settings pulldown",0
 );
 
 
@@ -189,7 +192,10 @@ if prop("common.prop","item.0.4")=="1" then
     "@sysmod",
     "system.prop",
 
+    "hide alarm notify","",0,
+    "hide bluetooth notify","",0,
     "hide ime notify","",0,
+    "hide volume notify","",0,
     "hide am/pm","",0
   );
 endif;
@@ -228,6 +234,30 @@ if prop("common.prop","item.0.8")=="1" then
   );
 else
     writetmpfile("navbar.prop", "selected.0=1\n");
+endif;
+
+#select heads up timeout
+if prop("common.prop","item.0.9")=="1" then
+	selectbox(
+      "heads up timeout",
+      "please indicate:",
+      "icons/apps",
+      "htimeout.prop",
+      
+      "don't change","",1,
+      "1 second","",0,
+      "2 seconds","",0,
+      "3 seconds","stock value",0,
+      "4 seconds","",0,
+      "5 seconds","",0,
+      "6 seconds","",0,
+      "7 seconds","",0,
+      "8 seconds","",0,
+      "9 seconds","",0,
+      "10 seconds","",0
+    );
+else
+    writetmpfile("vtimeout.prop", "selected.0=1\n");
 endif;
 
 ###################################################################################################################
