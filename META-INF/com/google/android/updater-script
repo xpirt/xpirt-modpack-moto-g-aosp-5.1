@@ -516,6 +516,16 @@ else
     	run_program("/tmp/tweaks.sh", "sys", "tweaks_qs_pulldown", "0");
 endif;
 
+if
+    file_getprop("/tmp/aroma-data/sysui.prop","item.0.6") == "1"
+then
+    ui_print("|-> battery percentage		      APPLIED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_battery_percentage", "2");
+else
+    ui_print("|-> battery percentage		      DISABLED");
+    	run_program("/tmp/tweaks.sh", "sys", "tweaks_battery_percentage", "0");
+endif;
+
 
 ###########################Permissions############################
 

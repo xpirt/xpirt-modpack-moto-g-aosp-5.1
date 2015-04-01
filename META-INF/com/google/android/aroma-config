@@ -161,7 +161,8 @@ checkbox(
   "disable brightness slider","disable brightness slider on panel",0,
   "enable ticker", "disable heads up and enable old ticker notifications",0,
   "double tap to sleep","double tab status bar to sleep",0,
-  "quick pulldown", "right statusbar corner quick settings pulldown",0
+  "quick pulldown", "right statusbar corner quick settings pulldown",0,
+  "battery percentage", "show battery percentage next to the icon",0
 );
 
 
